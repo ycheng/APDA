@@ -1,0 +1,228 @@
+#include "addressRsc.h"
+
+                                //   MainForm   UI
+                     
+FORM   ID   MainForm1000  AT (0 0 160 160) 
+NOFRAME
+USABLE
+BEGIN
+      TITLE "ADDRESS"
+      POPUPTRIGGER "" ID MainFormCategoryTrigger1001 AT (130 0 30 AUTO)  RIGHTANCHOR  FONT 0
+      POPUPLIST       ID MainFormCategoryTrigger1001 MainFormCategoryList1002
+      LIST  "" "" ""  ID MainFormCategoryList1002    AT (PREVLEFT PREVTOP 50 50)  NONUSABLE  VISIBLEITEMS 16 FONT 0
+      BUTTON "NEW" ID NewButton1004 AT (CENTER 145 AUTO AUTO) USABLE LEFTANCHOR FRAME FONT 0
+      REPEATBUTTON "\003" UpRepeatButton1005   AT (143 144 13 8)  NOFRAME FONT 5
+      REPEATBUTTON "\004" DownRepeatButton1006 AT (143 152 13 8)  NOFRAME FONT 5
+END        
+
+
+                               //   EditForm    UI
+                    
+FORM  ID  EditForm1100 AT  (0 0 160 160)                                  
+NOFRAME
+USABLE
+DEFAULTBTNID   CancelButton1105  
+MENUID         Menu2000
+BEGIN
+      TITLE "ADDRESS EDIT"
+      SELECTORTRIGGER "" ID EditCategoryTrigger1101 AT ( 120 1 39 11) USABLE  RIGHTANCHOR  FONT 0
+      POPUPLIST ID  EditCategoryTrigger1101  EditCategoryList1102 
+      LIST "" "" "" "" ID EditCategoryList1102 AT (PREVLEFT PREVTOP 50 50) NONUSABLE VISIBLEITEMS 4 FONT 0 
+      
+      LABEL "First Name:"   FName1110 AT (0 18) USABLE
+      LABEL "Last Name:"    LName1111 AT (0 PREVBOTTOM+1)  USABLE
+      LABEL "Title:"        Title1112 AT (0 PREVBOTTOM+1)  USABLE 
+      LABEL "Company:"    Company1113 AT (0 PREVBOTTOM+1)  USABLE
+      LABEL "Work:"       Work1114    AT (0 PREVBOTTOM+1)  USABLE
+      LABEL "Home:"       Home1115    AT (0 PREVBOTTOM+1)  USABLE
+      LABEL "Email:"      Email1116   AT (0 PREVBOTTOM+1)  USABLE
+      LABEL "Address:"    Address1117 AT (0 PREVBOTTOM+1)  USABLE
+      LABEL "City:"       City1118    AT (0 PREVBOTTOM+1)  USABLE
+      LABEL "Zip Code:"   Zip1119     AT (0 PREVBOTTOM+1)  USABLE
+      LABEL "Fax:"        Fax1120         AT (0 18)          NONUSABLE
+      LABEL "Mobile:"     Mobile1121      AT (0 PREVBOTTOM+1)  NONUSABLE
+      LABEL "Custom1:"    Custom1_1122    AT (0 PREVBOTTOM+1)  NONUSABLE  
+      LABEL "Custom2:"    Custom2_1123    AT (0 PREVBOTTOM+1)  NONUSABLE
+      LABEL "Custom3:"    Custom3_1124    AT (0 PREVBOTTOM+1)  NONUSABLE
+      LABEL "Custom4:"    Custom4_1125    AT (0 PREVBOTTOM+1)  NONUSABLE
+        
+      FIELD ID FNameField1126    AT  (48 18 110 11)                  USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211    
+      FIELD ID LNameField1127    AT  (PREVLEFT 30  110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211         
+      FIELD ID TitleField1128    AT  (PREVLEFT 42  110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211   
+      FIELD ID CompanyField1129  AT  (PREVLEFT 54  110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211   
+      FIELD ID WorkField1130     AT  (PREVLEFT 66 110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211   
+      FIELD ID HomeField1131     AT  (PREVLEFT 78  110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211   
+      FIELD ID EmailField1132    AT  (PREVLEFT 90  110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211   
+      FIELD ID AddressField1133  AT  (PREVLEFT 102  110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211   
+      FIELD ID CityField1134     AT  (PREVLEFT 114  110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211   
+      FIELD ID ZipField1135      AT  (PREVLEFT 126  110 11) USABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE   MAXCHARS 211 
+      FIELD ID FaxField1136     AT  (48 18 110 11)                   NONUSABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE     MAXCHARS 211
+      FIELD ID MobileField1137  AT  (PREVLEFT 30  110 11)  NONUSABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE     MAXCHARS 211
+      FIELD ID Custom1Field1138 AT  (PREVLEFT 42  110 11)  NONUSABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE     MAXCHARS 211
+      FIELD ID Custom2Field1139 AT  (PREVLEFT 54  110 11)  NONUSABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE     MAXCHARS 211
+      FIELD ID Custom3Field1140 AT  (PREVLEFT 66  110 11)  NONUSABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE     MAXCHARS 211
+      FIELD ID Custom4Field1141 AT  (PREVLEFT 78  110 11)  NONUSABLE LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE DYNAMICSIZE     MAXCHARS 211  
+      
+     BUTTON "Done"   ID DoneButton1104   AT (2  145 AUTO AUTO)                   USABLE LEFTANCHOR FRAME FONT 0
+     BUTTON "Cancel" ID CancelButton1105 AT (PREVRIGHT+5 PREVTOP      AUTO AUTO) USABLE LEFTANCHOR FRAME FONT 0
+     REPEATBUTTON "\003" ID UpButton1107     AT (PREVRIGHT+20 144    AUTO 8) NOFRAME USABLE DISABLED FONT 5  
+     REPEATBUTTON "\004" ID DownButton1108   AT (PREVLEFT     152   AUTO 8) NOFRAME USABLE          FONT 5
+      
+      
+      
+     
+    
+      
+END         
+
+STRINGTABLE ID  AppInfoString1000  "" "Unfiled" "Vincent's" "Jerry's" "" "" "" "" "" "" "" "" "" "" "" ""
+
+MENU   ID  Menu2000 
+BEGIN
+       PULLDOWN "Record"
+       BEGIN
+            MENUITEM "New Address"    ID NewItem2001  "N"
+            MENUITEM "Delete Address" ID DeleteItem2002 "D" 
+            MENUITEM  SEPARATOR
+            MENUITEM "Duplicate Address" ID DuplicateItem2012  "T"
+            MENUITEM "Secret Address" ID SecretItem2014 
+       END
+       
+       PULLDOWN "Edit"
+       BEGIN
+            MENUITEM "Undo"         ID UndoItem2003    "U"
+            MENUITEM "Cut"          ID CutItem2004     "X"
+            MENUITEM "Copy"         ID CopyItem2005    "C"
+            MENUITEM "Paste"        ID PasteItem2006   "P"
+            MENUITEM "Select All"   ID SelectAllItem2007   "S"
+       END  
+       
+       PULLDOWN "Options"
+       BEGIN
+            MENUITEM "About"              ID AboutItem2011
+       END
+
+END
+
+ 
+ 
+MENU   ID  Menu2100 
+BEGIN
+       
+       
+       PULLDOWN "Edit"
+       BEGIN
+            MENUITEM "Undo"         ID UndoItem2003    "U"
+            MENUITEM "Cut"          ID CutItem2004     "X"
+            MENUITEM "Copy"         ID CopyItem2005    "C"
+            MENUITEM "Paste"        ID PasteItem2006   "P"
+            MENUITEM "Select All"   ID SelectAllItem2007   "S"
+            MENUITEM  SEPARATOR
+            MENUITEM "Keyboard"     ID KeyboardItem2008   "K"
+            MENUITEM "Graffiti Help"ID Graffiti2009   "G"
+       END  
+       
+      
+
+END
+ 
+     
+    
+ 
+ 
+                           //  MenuBarDeleteAlert  ResID
+
+ALERT  ID  MenuBarDeleteAlert3000
+CONFIRMATION
+BEGIN
+      TITLE "Delete Current Record"
+      MESSAGE "Delete the current record !?\n"\ 
+                "Are You Sure?"
+      BUTTONS "OK" "Cancel" 
+END       
+                                                   
+       
+                          //  AboutForm  UI
+
+FORM ID AboutForm1300 AT (1 1 158 158)
+ 
+FRAME
+MODAL
+USABLE
+ 
+BEGIN
+     TITLE "                    About  AddressBook                       "
+     LABEL "Address Book"        ID  10  AT  (CENTER 18) USABLE  FONT 2
+     LABEL "Test  Version "      ID  11  AT  (CENTER 30) USABLE  FONT 1
+     LABEL "Sep, 21, 2001"       ID  12  AT  (CENTER 55) USABLE  FONT 1
+     LABEL "By Vincent Chen"     ID  13  AT  (CENTER 70) USABLE  FONT 1
+     LABEL "Tool:"               ID  14  AT  (CENTER 95) USABLE  FONT 1
+     LABEL "GCC for PalmPilot"   ID  15  AT  (CENTER 110)USABLE  FONT 1
+    
+     BUTTON "OK" ID OKButton1301 AT (CENTER 130 AUTO AUTO) 
+
+
+END  
+
+
+
+
+                        //  CustomFieldForm  UI
+
+FORM ID CustomFieldForm1400 AT (1 1 158 158)
+ 
+FRAME
+MODAL
+USABLE
+BEGIN
+     TITLE "                    Rename  Custom  Field                      "
+     LABEL "You  can  rename  the  custom "          ID  20  AT  (2 18)                  USABLE  FONT 1
+     LABEL "field  by  editing  the  text  of"       ID  21  AT  (PREVLEFT PREVBOTTOM+2) USABLE  FONT 1
+     LABEL "the  field  as  follows...  "            ID  22  AT  (PREVLEFT PREVBOTTOM+2) USABLE  FONT 1
+     Field ID  Custom1Field1401  AT (CENTER CENTER      60 AUTO) USABLE  LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE  MAXCHARS 9
+     Field ID  Custom2Field1402  AT (CENTER PREVBOTTOM+3  60 AUTO) USABLE  LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE  MAXCHARS 9
+     Field ID  Custom3Field1403  AT (CENTER PREVBOTTOM+3  60 AUTO) USABLE  LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE  MAXCHARS 9
+     Field ID  Custom4Field1404  AT (CENTER PREVBOTTOM+3  60 AUTO) USABLE  LEFTALIGN FONT 0 EDITABLE UNDERLINED SINGLELINE  MAXCHARS 9
+     BUTTON "OK"      ID OKButton1405     AT (40  PREVBOTTOM+10    AUTO AUTO) USABLE FRAME  FONT 0
+     BUTTON "Cancel"  ID CancelButton1406 AT (PREVRIGHT+10 PREVTOP AUTO AUTO) USABLE FRAME  FONT 0
+
+
+END  
+
+
+
+       
+
+                            //  FontDialogForm  UI
+
+FORM ID FontDialogForm1500 AT (1 80 156 79)
+ 
+FRAME
+MODAL
+USABLE
+BEGIN
+     TITLE "                    Select  Font                     "
+     LABEL "Font :"  ID 30  AT( 30 30 ) USABLE FONT 1
+     PUSHBUTTON  "A"   ID  StdFont1501    AT (PREVRIGHT+10 PREVTOP 15 15) USABLE FONT 0
+     PUSHBUTTON  "A"   ID  BoldFont1502   AT (PREVRIGHT    PREVTOP 15 15) USABLE FONT 1
+     PUSHBUTTON  "A"   ID  LargeFont1503  AT (PREVRIGHT    PREVTOP 15 15) USABLE FONT 2
+     BUTTON "OK"    ID OKButton1504       AT ( 10 PREVBOTTOM+15 AUTO AUTO)     USABLE FRAME  FONT 0 
+     BUTTON "Cancel"ID CancelButton1505   AT ( PREVRIGHT+10 PREVTOP AUTO AUTO) USABLE FRAME  FONT 0
+END  
+
+
+                            //  SecretAddressForm  UI
+
+FORM ID SecretAddressForm1600  AT (1 80 156 79)
+FRAME
+MODAL
+USABLE
+BEGIN
+      CHECKBOX "Secret Address Record" ID PrivateCheckBox1601 AT (30 30 AUTO AUTO)  USABLE        FONT 0       
+      BUTTON "OK"    ID OKButton1602       AT ( 10 PREVBOTTOM+15 AUTO AUTO)     USABLE FRAME  FONT 0 
+      BUTTON "Cancel"ID CancelButton1603   AT ( PREVRIGHT+10 PREVTOP AUTO AUTO) USABLE FRAME  FONT 0
+      TITLE "Private Record"
+END
+
+VERSION ID 1 "1.0"
+  

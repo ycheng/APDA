@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -x
+
+make -f Makefile TARGET=hotsync ExtraCFLAGS="-DSLAVE" FLTFLAGS="-z"
+
+gcc -g -Wall -DSLAVE  -DOPENTTY -DDEBUG -o slave hotsync.c
+gcc -g -Wall -DMASTER -DOPENTTY -DDEBUG  -o master hotsync.c

@@ -1,0 +1,138 @@
+#include "MailRsc.h"
+
+
+ //............................... MainForm  UI  script...................................
+ 
+FORM ID MainForm1000 AT (0 0 160 160)
+ 
+NOFRAME
+USABLE
+BEGIN
+    TITLE "Mail List"
+    BUTTON "Exit" ID ExitButton1002 AT (CENTER 145 AUTO AUTO) USABLE LEFTANCHOR FRAME FONT 0
+    REPEATBUTTON "\003" UpRepeatButton1003   AT (143 144 13 8)  NOFRAME FONT 5
+    REPEATBUTTON "\004" DownRepeatButton1004 AT (143 152 13 8)  NOFRAME FONT 5
+    
+END							
+
+
+
+                  
+                            
+
+//................................ViewForm UI  Script........................................
+      
+
+FORM ID ViewForm1100  AT  (0 0 160 160)
+MENUID  Menu2100 
+NOFRAME
+USABLE 
+
+BEGIN
+    TITLE "View Form"
+    LABEL "From :"   ID LabelFrom1107      AT (0 15) FONT 0
+    FIELD ID FieldFrom1105 AT (PREVRIGHT+3 PREVTOP 125 AUTO) USABLE FONT 0 EDITABLE   SINGLELINE MAXCHARS 64  
+    LABEL "Subj :"   ID LabelSubject1108 AT (0 PREVBOTTOM-2) FONT 0
+    FIELD ID FieldSubject1106 AT (PREVRIGHT+3 PREVTOP 128 AUTO) USABLE FONT 0 EDITABLE  SINGLELINE MAXCHARS 64  
+    FIELD ID Field1101 AT (0 PREVBOTTOM+3 153 100) USABLE FONT 0 EDITABLE  MULTIPLELINE MAXCHARS 65535  HASSCROLLBAR
+    SCROLLBAR ID Scrollbar1104 AT (153 PREVTOP 7 105)  VALUE 0 MIN 0 MAX 0 PAGESIZE 9 
+    BUTTON "Done"    ID DoneButton1102    AT (5 145     AUTO AUTO) USABLE LEFTANCHOR FRAME FONT 0
+    BUTTON "Delete"  ID DeleteButton1103  AT (PREVRIGHT+10 PREVTOP AUTO AUTO) USABLE LEFTANCHOR FRAME FONT 0                              
+    
+END       
+
+  
+ 
+//................................... Menu (on EditForm)Script ..........................
+                                    
+
+   
+   
+   
+   
+MENU  ID Menu2100
+BEGIN 
+       
+       PULLDOWN "Options"
+       BEGIN
+            MENUITEM "Font"   ID FontItem2111  "F"
+            MENUITEM "About"  ID AboutItem2108    
+       END
+ 
+END       
+       
+       
+       
+//....................................... Alerts Script......................................
+
+
+ALERT ID DeleteAlert3100
+    
+    CONFIRMATION
+    BEGIN
+        TITLE "Delete Mail"
+        MESSAGE "Delete the mail !?\n"\ 
+                "Are You Sure?"
+        BUTTONS "OK" "Cancel" 
+    END       
+    
+    
+ 
+ALERT ID TestAlert3101
+    
+    INFORMATION
+    BEGIN
+        TITLE "Test Alert"
+        MESSAGE "Do You See Me !?\n" 
+        BUTTONS "OK"  
+    END
+    
+    
+    
+    
+//.........................................AboutForm  Script.............................
+     
+
+FORM ID AboutForm1200 AT (1 1 158 158)
+ 
+FRAME
+MODAL
+USABLE
+ 
+BEGIN
+     TITLE "                    About   DbTest                     "
+     LABEL "Mail Viewer"           ID  10  AT  (CENTER 18) USABLE  FONT 2
+     LABEL "Version 1.0"         ID  11  AT  (CENTER 30) USABLE  FONT 1
+     LABEL "Nov. 23, 2001"     ID  12  AT  (CENTER 55) USABLE  FONT 1
+     LABEL "By Vincent Chen"     ID  13  AT  (CENTER 70) USABLE  FONT 1
+     LABEL "Tool:"               ID  14  AT  (CENTER 95) USABLE  FONT 1
+     LABEL "GCC for PalmPilot"   ID  15  AT  (CENTER 110)USABLE  FONT 1
+    
+     BUTTON "OK" ID OKButton1201 AT (CENTER 130 AUTO AUTO) 
+
+
+END  
+
+
+
+
+
+
+//--------------------------------------Font Dialog----------------------------
+
+      
+
+FORM ID FontDialogForm1300 AT (1 80 156 79)
+FRAME
+MODAL
+USABLE
+BEGIN
+     TITLE "                    Select  Font                     "
+     LABEL "Font :"  ID 30  AT( 30 30 ) USABLE FONT 1
+     PUSHBUTTON  "A"   ID  StdFont1301    AT (PREVRIGHT+10 PREVTOP 15 15) USABLE FONT 0
+     PUSHBUTTON  "A"   ID  BoldFont1302   AT (PREVRIGHT    PREVTOP 15 15) USABLE FONT 1
+     PUSHBUTTON  "A"   ID  LargeFont1303  AT (PREVRIGHT    PREVTOP 15 15) USABLE FONT 2
+     BUTTON "OK"    ID OKButton1304       AT ( 10 PREVBOTTOM+15 AUTO AUTO)     USABLE FRAME  FONT 0 
+     BUTTON "Cancel"ID CancelButton1305   AT ( PREVRIGHT+10 PREVTOP AUTO AUTO) USABLE FRAME  FONT 0
+END  
+

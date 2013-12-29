@@ -1,0 +1,4 @@
+BOOL COMDLG_ComDlgGetFileName ( WORD wAction, LPSTR szFileName );
+
+#define COMDLG_ACTION_FILEOPEN    1
+#define COMDLG_ACTION_FILESAVEAS  2

@@ -1,0 +1,39 @@
+#include "calculatorRsc.h"
+
+
+     //Calculator Form UI
+     
+FORM   ID  CalculatorForm1000  AT (0 0 160 160)
+NOFRAME
+USABLE
+BEGIN
+        FIELD  ID DisplayField1098   AT (5 5 150 12) FONT 1  NONEDITABLE  RIGHTALIGN
+        BUTTON "" ID FieldBorder1099 AT (1 1 158 20) FRAME   DISABLED
+  
+        BUTTON "7" ID Seven1007    AT ( 7            PREVBOTTOM+4 30 20 ) USABLE   Font 6
+        BUTTON "8" ID Eight1008    AT ( PREVRIGHT+5  PREVTOP      30 20 ) USABLE   Font 6	
+        BUTTON "9" ID Nine1009     AT ( PREVRIGHT+5  PREVTOP      30 20 ) USABLE   Font 6
+        BUTTON "/" ID Divide1013   AT ( PREVRIGHT+10 PREVTOP      30 20 ) USABLE   Font 1
+        BUTTON "4" ID Four1004     AT ( 7            PREVBOTTOM+4 30 20 ) USABLE   Font 6
+        BUTTON "5" ID Five1005     AT ( PREVRIGHT+5  PREVTOP      30 20 ) USABLE   Font 6
+        BUTTON "6" ID Six1006      AT ( PREVRIGHT+5  PREVTOP      30 20 ) USABLE   Font 6
+        BUTTON "*" ID Multiply1014 AT ( PREVRIGHT+10 PREVTOP      30 20 ) USABLE   Font 1
+        BUTTON "1" ID One1001      AT ( 7            PREVBOTTOM+4 30 20 ) USABLE   Font 6
+        BUTTON "2" ID Two1002      AT ( PREVRIGHT+5  PREVTOP      30 20 ) USABLE   Font 6
+        BUTTON "3" ID Three1003    AT ( PREVRIGHT+5  PREVTOP      30 20 ) USABLE   Font 6
+        BUTTON "-" ID Sub1015      AT ( PREVRIGHT+10 PREVTOP      30 20 ) USABLE   Font 1 
+        BUTTON "." ID Dot1011      AT ( 7            PREVBOTTOM+4 25 20 ) USABLE   Font 1
+        BUTTON "0" ID Zero1010     AT ( PREVRIGHT+5  PREVTOP      40 20 ) USABLE   Font 6
+        BUTTON "+/-" ID Sign1012   AT ( PREVRIGHT+5  PREVTOP      25 20 ) USABLE   Font 1
+        BUTTON "+" ID Add1016      AT ( PREVRIGHT+10 PREVTOP      30 20 ) USABLE   Font 1
+        BUTTON "C" ID Clear1017    AT ( 7            PREVBOTTOM+4 20 20 ) USABLE   Font 1
+        BUTTON "=" ID Equal1018    AT ( PREVRIGHT+5  PREVTOP      50 20 ) USABLE   Font 1
+        BUTTON "CE" ID CE1019      AT ( PREVRIGHT+5  PREVTOP      20 20 ) USABLE   Font 1
+        BUTTON "%" ID Percent1020  AT ( PREVRIGHT+10 PREVTOP      30 20 ) USABLE   Font 1
+        BUTTON "BackSpace" ID BS1021 AT ( 7        PREVBOTTOM+4 138 AUTO) USABLE   Font 1
+END       
+
+
+
+//        BUTTON "Sqrt" ID Sqrt1019  AT ( PREVRIGHT+5  PREVTOP      20 20 ) USABLE   Font 1
+

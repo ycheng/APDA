@@ -1,0 +1,21 @@
+MACHINE=arm
+CROSS=arm-elf-
+CC=$(CROSS)gcc
+AR=$(CROSS)ar
+RANLIB=$(CROSS)ranlib
+AS=$(CROSS)as
+
+CPU_CFLAGS	=	-msoft-float -mcpu=arm7tdmi -fomit-frame-pointer
+DFLAGS		=	-D_uclinux_ -DEMBED -DLINUX
+CFLAGS		=	-I../../../uClibc/include -I../include -I. $(ARCH_CFLAGS) $(CPU_CFLAGS) $(DFLAGS)
+
+#CFLAGS= -g -O2 -D__linux__ -D_uclinux_ -I../include -I. -I../../../uClibc/include
+
+.S.s:
+	$(CC) $(CFLAGS) -D__ASSEMBLY__ -traditional -E -o $*.s $<
+
+.S.o:
+	$(CC) $(CFLAGS) -c -o $*.o $<
+
+.s.o:
+	$(CC) $(CFLAGS) -c -o $*.o $<

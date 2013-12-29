@@ -1,0 +1,1 @@
+#define ResourceFileName_0	"mail.rcp"

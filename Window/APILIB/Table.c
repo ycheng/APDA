@@ -1,0 +1,1107 @@
+/*========================================================
+  Table.c
+  all routine is running with Platform non-related,
+  simulated the list control function in Palm OS.
+  Current status is ControlModal free funtion.
+
+  Only TblReverseItem is Palm non-related function.
+  Completed 46 of 58 List Control function.
+
+  (c)2001, Jerry Chu, WISCORE, All Rights Reserved
+
+  Last updated: 0328, 2001 by Jerry Chu
+ =========================================================*/
+#include <VCommon.h>
+#include <VPdaSDK.h>
+
+#ifdef	LINUX
+#include <vxddk.h>
+#else
+#include <vmsddk.h>
+#endif
+
+
+extern Int16 WPushEvent (const EventType *event);
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblDrawTable
+//
+// DESCRIPTION: This routine draw a table.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//
+// RETURNED:    nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/1/01	Initial Revision
+//			Jerry 8/06/01	Prevent tableP->numRows be zero
+//			Jerry 8/08/01	Add to call callback function
+//			Jerry	8/13/01	Modify check Row usable to Column usable
+////////////////////////////////////////////////////////////////////////
+void TblDrawTable (TableType *tableP)
+{
+	UInt16	ix, iy;
+	UInt16	offset, Height;
+	RectangleType	rect;
+	
+	if ( tableP->numRows )
+		Height = tableP->bounds.extent.y/tableP->numRows;
+
+	for ( iy = 0; iy < tableP->numRows; iy++ ) {
+		offset = 0;
+//		if ( tableP->rowAttrs[iy].usable ) {
+		for ( ix = 0; ix < tableP->numColumns; ix++ ) {
+			if ( tableP->columnAttrs[ix].usable ) {
+				VDrawTable ( (UInt16)(tableP->bounds.topLeft.x+offset), 
+							 (UInt16)(tableP->bounds.topLeft.y+Height*iy), 
+							 &(tableP->items[iy*tableP->numColumns+ix]),
+							 tableP->columnAttrs[ix].width,
+							 Height);
+
+				if ( tableP->columnAttrs[ix].drawCallback ) {
+					rect.topLeft.x = (UInt16)(tableP->bounds.topLeft.x+offset);
+					rect.topLeft.y = (UInt16)(tableP->bounds.topLeft.y+Height*iy);
+					rect.extent.x = tableP->columnAttrs[ix].width;
+					rect.extent.y = Height;
+					tableP->columnAttrs[ix].drawCallback (tableP, iy, ix, &rect);
+				}
+			}
+			offset += tableP->columnAttrs[ix].width;
+		}
+//		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblEditing
+//
+// DESCRIPTION: This routine check whether a table is in edit mode
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to the table object
+//
+// RETURNED:    Returns ture if the table is in edit mode, false otherwise
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/23/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Boolean TblEditing (const TableType *tableP)
+{
+	return	tableP->attr.editable;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblEraseTable
+//
+// DESCRIPTION: This routine erase a table object
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the table object
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/23/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblEraseTable (TableType *tableP)
+{
+	tableP->attr.visible = FALSE;
+	tableP->attr.selected = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblFindRowID
+//
+// DESCRIPTION: This routine return the number of rows with the 
+//				specified ID.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(UInt16) id - Row ID to find.
+//				(Int16 *) rowP - Pointer to the row number.
+//
+// RETURNED:    Returns true if a match was found, false otherwise
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/7/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Int16 TblFindRowID (const TableType *tableP, UInt16 id, Int16 *rowP)
+{
+	UInt16	i;
+
+	for ( i = 0; i < tableP->numRows; i++ ) {
+		if ( tableP->rowAttrs[i].id == id ) {
+			*rowP = i;
+			return	TRUE;
+		}
+	}
+
+	return	FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetBounds
+//
+// DESCRIPTION: This routine return the bounds of table
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the table object
+//				(RectangleType *) r - A RectangleType structure in which
+//									the bounds are returned
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/23/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblGetBounds (const TableType *tableP, RectangleType *r)
+{
+	*r = tableP->bounds;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetColumnSpacing
+//
+// DESCRIPTION: This routine return the spacing after the specified column
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) column - Column number.
+//
+// RETURNED:    Returns the spacing after column (in pixels)
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/23/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Int16 TblGetColumnSpacing (const TableType *tableP, Int16 column)
+{
+	return tableP->columnAttrs[column].spacing;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetColumnWidth
+//
+// DESCRIPTION: This routine return the width of the specified column
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) column - Column number.
+//
+// RETURNED:    Returns the width of a column (in pixels)
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/23/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Int16 TblGetColumnWidth (const TableType *tableP, Int16 column)
+{
+	return tableP->columnAttrs[column].width;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetCurrentField
+//
+// DESCRIPTION: This routine return a pointer to the FieldType in 
+//				which the user is currently editing a text item
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//
+// RETURNED:    Returns a pointer to the currently selected field, 
+//				or NULL if the table is not in edit mode
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/7/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+FieldPtr TblGetCurrentField (const TableType *tableP)
+{
+	return	(FieldPtr)&(tableP->currentField);
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetItemFont
+//
+// DESCRIPTION: This routine return the font used to display a table item.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//				(Int16) column - Column number of the item.
+//
+// RETURNED:    Returns the ID of the font used for the table item at 
+//				the row and column indicated.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+FontID TblGetItemFont (const TableType *tableP, Int16 row, Int16 column)
+{
+	return	tableP->items[row*tableP->numColumns+column].fontID;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetItemInt
+//
+// DESCRIPTION: This routine return the integer value stored in a table
+//				item.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//				(Int16) column - Column number of the item.
+//
+// RETURNED:    Returns the integer value.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Int16 TblGetItemInt (const TableType *tableP, Int16 row, Int16 column)
+{
+	return	tableP->items[row*tableP->numColumns+column].intValue;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetItemPtr
+//
+// DESCRIPTION: This routine return the pointer value stored in table item.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//				(Int16) column - Column number of the item.
+//
+// RETURNED:    Returns the item's pointer value or NULL if the item does
+//				not hav a pointe value.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void *TblGetItemPtr (const TableType *tableP, Int16 row, Int16 column)
+{
+	return	tableP->items[row*tableP->numColumns+column].ptr;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetLastUsableRow
+//
+// DESCRIPTION: This routine return the last row in a table is usable
+//				(visible).
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//
+// RETURNED:    Returns the row index or tblUnusableRow if there are 
+//				no usable rows.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Int16 TblGetLastUsableRow (const TableType *tableP)
+{
+	Int16	i;
+
+	for ( i = tableP->numRows-1; i >= 0; i-- ) {
+		if ( tableP->rowAttrs[i].usable ) {
+			return	i;
+		}
+	}
+
+	return	-1;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetNumberOfRows
+//
+// DESCRIPTION: This routine return the number of rows in a table
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//
+// RETURNED:    Returns the maximum number of visible rows in the
+//				specified table.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/7/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Int16 TblGetNumberOfRows (const TableType *tableP)
+{
+	return tableP->numRows;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetRowData
+//
+// DESCRIPTION: This routine return the data value of the specified row.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//
+// RETURNED:    Returns the the application-specific data stored for
+//				this ow, if any. Returns 0 if there is no 
+//				application-specific data value.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+UInt32 TblGetRowData (const TableType *tableP, Int16 row)
+{
+	return	tableP->rowAttrs[row].data;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetRowHeight
+//
+// DESCRIPTION: This routine return the height of the specified row
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//
+// RETURNED:    Returns the height in pixels.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Coord TblGetRowHeight (const TableType *tableP, Int16 row)
+{
+	return	tableP->rowAttrs[row].height;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetRowID
+//
+// DESCRIPTION: This routine return the ID value of the specified row.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//
+// RETURNED:    Returns the ID value of the row in the table.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+UInt16 TblGetRowID (const TableType *tableP, Int16 row)
+{
+	return	tableP->rowAttrs[row].id;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGetSelection
+//
+// DESCRIPTION: This routine return the row and column of the currently
+//				selected table item.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) *rowP - the row index of the currently selected
+//							item.
+//				(Int16) *columnP - the column index of the currently 
+//							selected item.
+//
+// RETURNED:    Returns true if the item is highlighted, false if not.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Boolean TblGetSelection (const TableType *tableP, Int16 *rowP, Int16 *columnP)
+{
+	*rowP = tableP->currentRow;
+	*columnP = tableP->currentColumn;
+
+	return	tableP->attr.selected;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblGrabFocus
+//
+// DESCRIPTION: This routine put a table nto edit mode
+//
+// PARAMETERS:  (TableType *)tableP - pointer to a table object
+//				(Int16) row - Current row to be edited.
+//				(Int16) column - Current column to be edited.
+//
+// RETURNED:    Returns nothing. This function may display a fatal error
+//				message if the table already has the focus or if the 
+//				row or column parameter is invalid.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/7/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblGrabFocus (TableType *tableP, Int16 row, Int16 column)
+{
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblHasScrollBar
+//
+// DESCRIPTION: This routine set the hasScrollBar attribute in the table.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to a table object
+//				(Boolean) hasScrollBar - true to set the attribute, false 
+//								to unset it.
+//
+// RETURNED:    Returns nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblHasScrollBar (TableType *tableP, Boolean hasScrollBar)
+{
+	tableP->attr.hasScrollBar = hasScrollBar;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblMarkRowInvalid
+//
+// DESCRIPTION: This routine mark the row invalid.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//
+// RETURNED:    Returns nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblMarkRowInvalid (const TableType *tableP, Int16 row)
+{
+	tableP->rowAttrs[row].invalid = TRUE;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblMarkTableInvalid
+//
+// DESCRIPTION: This routine mark all the rows in a table invalid.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//
+// RETURNED:    Returns nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblMarkTableInvalid (const TableType *tableP)
+{
+	Int16	i;
+
+	for ( i = 0; i < tableP->numRows; i++ ) {
+		TblMarkRowInvalid (tableP, i);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblReverseItem (Add by Jerry, not in Palm OS)
+//
+// DESCRIPTION: This routine reverse the color of the input item
+//				(row is the selection record, and column is the
+//				 field that been clicked)
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row of the table
+//				(Int16) column - column of the table
+//
+// RETURNED:    nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/5/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblReverseItem (TableType *tableP, Int16 row, Int16 column)
+{
+	RectangleType	rect;
+	UInt16	Height = tableP->bounds.extent.y/tableP->numRows;
+	UInt16	offset1 = tableP->bounds.topLeft.x; 
+	UInt16	offset2=0, i ;
+
+	for ( i = 0; i < column; i++ ) {
+		offset1 += tableP->columnAttrs[i].width;
+	}
+	offset2 = tableP->columnAttrs[column].width;
+	rect.topLeft.x = offset1;
+	rect.topLeft.y = (tableP->bounds.topLeft.y+row*Height);
+	rect.extent.x = offset2;
+	rect.extent.y = Height;
+
+	VDrawRect (&rect, PS_SOLID, 0, CL_FOREGROUND, COORD_STRETCH, DRAW_SET);
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblRowInvalid
+//
+// DESCRIPTION: This routine return whether a row is invalid.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//
+// RETURNED:    Returns true if the row is invalid, false if it's valid.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Boolean TblRowInvalid (const TableType *tableP, Int16 row)
+{
+	return	tableP->rowAttrs[row].invalid;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblRowMasked
+//
+// DESCRIPTION: This routine return whether a row is masked.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//
+// RETURNED:    Returns true if the row is masked, false otherwise
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Boolean TblRowMasked (const TableType *tableP, Int16 row)
+{
+	return	tableP->rowAttrs[row].masked;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblRowSelectable
+//
+// DESCRIPTION: This routine return whether the specified row is selectable.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//
+// RETURNED:    Returns true if the row is selectable, false otherwise
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Boolean TblRowSelectable (const TableType *tableP, Int16 row)
+{
+	return	tableP->rowAttrs[row].selectable;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblRowUsable
+//
+// DESCRIPTION: Determine whether the specified row is usable.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row of the table
+//
+// RETURNED:    Returns true if the row is usable, false if it's not.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/6/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+Boolean TblRowUsable (TableType *tableP, Int16 row)
+{
+	return	tableP->rowAttrs[row].usable;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSelectItem
+//
+// DESCRIPTION: This routine select (hightlight) the specified item.
+//					 If there is already a selected item, it is unhighlighted.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//					 (Int16) row - row of the table
+//					 (Int16) column - column of the table.
+//
+// RETURNED:    Returns nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	5/28/01	Initial Revision
+//			Jerry	8/28/01	Modify to push the event to the queue
+////////////////////////////////////////////////////////////////////////
+void TblSelectItem (TableType *tableP, Int16 row, Int16 column)
+{
+	CurEvent->data.tblEnter.pTable = tableP;
+	CurEvent->data.tblEnter.row = row;
+	CurEvent->data.tblEnter.column = column;
+	CurEvent->eType = tblEnterEvent;
+
+	WPushEvent (CurEvent);
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetBounds
+//
+// DESCRIPTION: This routine set the bounds of a table.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the table object
+//				(const RectangleType *) rP - Pointer to a RectangleType 
+//									that specifies the bounds of the table
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetBounds (TableType *tableP, const RectangleType *rP)
+{
+	tableP->bounds = *rP;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetColumnEditIndicator
+//
+// DESCRIPTION: This routine set the column attribute that controls
+//				whether a column hghlights when the table is in edit
+//				mode.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) column - column of the table
+//				(Boolean) editIndicator - true to highlight, false to tun off
+//
+// RETURNED:    Return nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetColumnEditIndicator (TableType *tableP, Int16 column, Boolean editIndicator)
+{
+	tableP->columnAttrs[column].editIndicator = editIndicator;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetColumnMasked
+//
+// DESCRIPTION: This routine set whether the column is masked
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) column - column of the table
+//				(Boolean) masked - true to have the column be masked,
+//							false otherwise
+//
+// RETURNED:    Return nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetColumnMasked (TableType *tableP, Int16 column, Boolean masked)
+{
+	tableP->columnAttrs[column].masked = masked;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetColumnSpacing
+//
+// DESCRIPTION: This routine set the spacing after the specified column
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) column - column of the table
+//				(Coord) spacing - Spacing after the column in pixels
+//
+// RETURNED:    Return nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetColumnSpacing (TableType *tableP, Int16 column, Coord spacing)
+{
+	tableP->columnAttrs[column].spacing = spacing;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetColumnUsable
+//
+// DESCRIPTION: This routine set a column in a table to usable or
+//				unusable.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) column - column of the table
+//				(Boolean) usable - true for usable or false for not usable.
+//
+// RETURNED:    Return nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/1/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetColumnUsable (TableType *tableP, Int16 column, Boolean usable)
+{
+	tableP->columnAttrs[column].usable = usable;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetColumnWidth
+//
+// DESCRIPTION: This routine set the width of the specified column
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) column - column of the table
+//				(Coord) width - Width of the column
+//
+// RETURNED:    Return nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetColumnWidth (TableType *tableP, Int16 column, Coord width)
+{
+	tableP->columnAttrs[column].width = width;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetCustomDrawProcedure
+//
+// DESCRIPTION: This routine set the custom draw callback procedure
+//				for the specified column
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) column - column of the table
+//				(TableDrawItemFuncPtr) drawCallback - Callback function.
+//
+// RETURNED:    Return nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetCustomDrawProcedure (TableType *tableP, Int16 column, TableDrawItemFuncPtr drawCallback)
+{
+	tableP->columnAttrs[column].drawCallback = drawCallback;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetItemFont
+//
+// DESCRIPTION: This routine set the font used to display a table item.
+//
+// PARAMETERS:  (const TableType *)tableP - pointer to a table object
+//				(Int16) row - Row number of the item.
+//				(Int16) column - Column number of the item.
+//				(FontID) fontID - ID of the font to be used.
+//
+// RETURNED:    Returns nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetItemFont (const TableType *tableP, Int16 row, Int16 column, FontID fontID)
+{
+	tableP->items[row*tableP->numColumns+column].fontID = fontID;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetItemInt
+//
+// DESCRIPTION: This routine set the integer value of the specified item
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the table object
+//				(Int16) row - row of the table
+//				(Int16) column - column of the table
+//				(Int16) value - Any byte value.
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/23/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetItemInt (TableType *tableP, Int16 row, Int16 column, Int16 value)
+{
+	tableP->items[row*tableP->numColumns+column].intValue = value;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetItemPtr
+//
+// DESCRIPTION: This routine set the item to the specified pointer value
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row of the table
+//				(Int16) column - column of the table
+//				(void *) value - Pointer to data to display in the
+//							table item.
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetItemPtr (TableType *tableP, Int16 row, Int16 column, void *value)
+{
+	tableP->items[row*tableP->numColumns+column].ptr = value;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetItemStyle
+//
+// DESCRIPTION: This routine set the type of item to display;
+//				for example, text, numbers, dates, and so on.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row of the table
+//				(Int16) column - column of the table
+//				(TableItemStyleType) type - The type of item, such as an editable
+//											text field or a check box.
+//
+// RETURNED:    nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/1/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetItemStyle (TableType *tableP, Int16 row, Int16 column, TableItemStyleType type)
+{
+	tableP->items[row*tableP->numColumns+column].itemType = type;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetLoadDataProcedure
+//
+// DESCRIPTION: This routine set the load-data callback callback procedure
+//				for the specified column
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) column - column of the table
+//				(TableLoadDataFuncPtr) loadDataCallback - Callback function.
+//
+// RETURNED:    Return nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetLoadDataProcedure (TableType *tableP, Int16 column, TableLoadDataFuncPtr loadDataCallback)
+{
+	tableP->columnAttrs[column].loadDataCallback = loadDataCallback;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetRowData
+//
+// DESCRIPTION: This routine set the data value of the specified row.
+//				The data value is a placeholder for application-specific
+//				values.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row number
+//				(UInt32) data - Application-specific data value to store
+//							for this row. For example, the Datebook and
+//							ToDo applications use this field to store
+//							the unique ID of the database record 
+//							displayed by this row.
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetRowData (TableType *tableP, Int16 row, UInt32 data)
+{
+	tableP->rowAttrs[row].data = data;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetRowHeight
+//
+// DESCRIPTION: This routine set height of the specified row
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row number
+//				(Coord) height - new height in pixels.
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/6/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetRowHeight (TableType *tableP, Int16 row, Coord height)
+{
+	tableP->rowAttrs[row].height = height;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetRowData
+//
+// DESCRIPTION: This routine set the ID value of the specified row.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row number
+//				(UInt16) id - ID to identify a row.
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetRowID (TableType *tableP, Int16 row, UInt16 id)
+{
+	tableP->rowAttrs[row].id = id;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetRowMasked
+//
+// DESCRIPTION: This routine set a row in a table to masked or
+//				unmasked.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row of the table
+//				(Boolean) masked - true to have the row be masked,
+//								false otherwise
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetRowMasked (TableType *tableP, Int16 row, Boolean masked)
+{
+	tableP->rowAttrs[row].masked = masked;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetRowSelectable
+//
+// DESCRIPTION: This routine set a row in a table to selectable or
+//				nonselectable.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row of the table
+//				(Boolean) selectable - true or false.
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetRowSelectable (TableType *tableP, Int16 row, Boolean selectable)
+{
+	tableP->rowAttrs[row].selectable = selectable;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetRowStaticHeight
+//
+// DESCRIPTION: This routine set the static height attribute of a row
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row of the table
+//				(Boolean) staticHeight - true to set the static height,
+//							false to unset it.
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetRowStaticHeight (TableType *tableP, Int16 row, Boolean staticHeight)
+{
+	tableP->rowAttrs[row].staticHeight = staticHeight;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetRowUsable
+//
+// DESCRIPTION: This routine set a row in a table to usable or
+//				unusable.
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) row - row of the table
+//				(Boolean) usable - true for usable or false for not usable.
+//
+// RETURNED:    Returns nothing
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/1/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetRowUsable (TableType *tableP, Int16 row, Boolean usable)
+{
+	tableP->rowAttrs[row].usable = usable;
+}
+
+////////////////////////////////////////////////////////////////////////
+// FUNCTION:    TblSetSaveDataProcedure
+//
+// DESCRIPTION: This routine set the save-data callback procedure
+//				for the specified column
+//
+// PARAMETERS:  (TableType *)tableP - pointer to the ToDo list table (TablePtr)
+//				(Int16) column - column of the table
+//				(TableSaveDataFuncPtr) saveDataCallback - Callback function.
+//
+// RETURNED:    Return nothing.
+//
+// REVISION HISTORY:
+//			Name	Date		Description
+//			----	----		-----------
+//			Jerry	3/28/01		Initial Revision
+////////////////////////////////////////////////////////////////////////
+void TblSetSaveDataProcedure (TableType *tableP, Int16 column, TableSaveDataFuncPtr saveDataCallback)
+{
+	tableP->columnAttrs[column].saveDataCallback = saveDataCallback;
+}

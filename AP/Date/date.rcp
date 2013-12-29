@@ -1,0 +1,47 @@
+
+#include "dateRsc.h"
+
+FORM ID DateViewForm1000  AT (1 1 158 158)
+NOFRAME
+USABLE
+BEGIN
+	LABEL "2001"   ID  YearLabel1001  AT(45 20) USABLE  FONT 1
+
+	REPEATBUTTON "\005" LeftRepeatButton1002 AT (25 20 8 13) USABLE NOFRAME FONT 5
+	REPEATBUTTON "\006" RightRepeatButton1003 AT (75 20 8 13) USABLE NOFRAME FONT 5
+	REPEATBUTTON "\005" YearLeftRepeatButton1004 AT (15 20 8 13) USABLE NOFRAME FONT 5
+	REPEATBUTTON "\006" YearRightRepeatButton1005  AT (85 20 8 13) USABLE NOFRAME FONT 5
+        LIST "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec" 
+             ID MonthList1007 AT (130 20 25 50) USABLE VISIBLEITEMS 12 FONT 0 
+	
+        LABEL "Year To Go : " ID SetYearLabel1010 AT (10 142) USABLE FONT 0 
+        FIELD ID YearField1011 AT (PREVRIGHT+5 PREVTOP 25 AUTO) USABLE EDITABLE UNDERLINED SINGLELINE MAXCHARS 4 FONT 0 
+        BUTTON "OK" OKBtn1012  AT (PREVRIGHT+10 PREVTOP 15 AUTO)   USABLE 
+	TITLE "                         Date      View                     "
+END
+
+
+                          //  IllegalAlert  UI
+
+ALERT  ID  IllegalAlert1100
+INFORMATION
+DEFAULTBUTTON  0
+BEGIN
+      TITLE "Out of year Range"
+      MESSAGE "Please input correct year !\n"\ 
+                "( 1904 -- 2099 )"
+      BUTTONS "OK" 
+END                         
+
+      //trigger
+//SELECTORTRIGGER "" ID MonthTrigger1006 AT (125 20 25 11) USABLE  FONT 1
+//POPUPLIST ID   MonthTrigger1006  MonthList1007 
+//LIST "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec" 
+//             ID MonthList1007 AT (PREVLEFT PREVTOP 25 50) NONUSABLE VISIBLEITEMS 12 FONT 0 
+
+      // only list
+//LIST "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec" 
+             //ID MonthList1007 AT (130 20 25 50) USABLE VISIBLEITEMS 12 FONT 0 
+
+
+//  BUTTON "Cancel" ID  CancelBtn1008  AT(CENTER 145 33 14)  USABLE  LEFTANCHOR  FRAME  FONT 0
